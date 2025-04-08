@@ -4,10 +4,13 @@ import lombok.Data;
 
 import java.io.Serializable;
 
+/**
+ * @author Ace
+ */
 @Data
 public class EmployeeDTO implements Serializable {
 
-    //private Long id;
+    private Long id;
 
     private String username;
 
