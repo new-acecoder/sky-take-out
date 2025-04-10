@@ -73,7 +73,7 @@ public class EmployeeController {
     }
 
     /**
-     *
+     *新增员工
      * @param employeeDTO
      * @return
      */
@@ -132,4 +132,6 @@ public class EmployeeController {
         employeeService.update(employeeDTO);
         return Result.success();
     }
+
+
 }
