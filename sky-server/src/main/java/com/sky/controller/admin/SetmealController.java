@@ -10,6 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * 套餐管理
  */
@@ -41,6 +43,13 @@ public class SetmealController {
     public Result save(@RequestBody SetmealDTO setmealDTO) {
         log.info("新增套餐{}", setmealDTO);
         setmealService.saveWithDish(setmealDTO);
+        return Result.success();
+    }
+
+    @DeleteMapping
+    public Result delete(@RequestParam List<Long> ids) {
+        //这个参数前要加@RequestParam
+        setmealService.deleteBatch(ids);
         return Result.success();
     }
 }
