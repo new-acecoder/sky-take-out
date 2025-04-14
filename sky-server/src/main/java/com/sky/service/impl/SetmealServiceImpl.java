@@ -86,12 +86,16 @@ public class SetmealServiceImpl implements SetmealService {
                 throw new DeletionNotAllowedException(MessageConstant.SETMEAL_ON_SALE);
             }
         });
-
+        /*
         ids.forEach(setmealId -> {
            //删除套餐表的数据
            setmealMapper.deleteById(setmealId);
-           //删除套餐菜品关系表中得到数据
+           //删除套餐菜品关系表中到数据
             setmealDishMapper.deleteBySetmealId(setmealId);
-        });
+        });*/
+        //批量删除套餐表的数据
+        setmealMapper.deleteBatchBySetmealIds(ids);
+        //批量删除套餐菜品关系表中到数据
+        setmealDishMapper.deleteBatchBySetealIds(ids);
     }
 }
