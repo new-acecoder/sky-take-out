@@ -13,6 +13,13 @@ import org.apache.ibatis.annotations.Select;
 public interface SetmealMapper {
 
     /**
+     * 根据id修改套餐
+     * @param setmeal
+     */
+    @AutoFill(OperationType.INSERT)
+    void update(Setmeal setmeal);
+
+    /**
      * 根据分类id查询套餐的数量
      * @param id
      * @return

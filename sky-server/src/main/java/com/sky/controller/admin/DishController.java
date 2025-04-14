@@ -45,7 +45,6 @@ public class DishController {
         log.info("菜品分页查询{}:",dishPageQueryDTO);
         PageResult pageResult = dishService.pageQuery(dishPageQueryDTO);
         return Result.success(pageResult);
-
     }
 
     /**
