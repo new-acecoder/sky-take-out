@@ -16,6 +16,7 @@ import com.sky.mapper.SetmealDishMapper;
 import com.sky.mapper.SetmealMapper;
 import com.sky.result.PageResult;
 import com.sky.service.SetmealService;
+import com.sky.vo.DishItemVO;
 import com.sky.vo.SetmealVO;
 import org.apache.logging.log4j.message.Message;
 import org.springframework.beans.BeanUtils;
@@ -39,18 +40,20 @@ public class SetmealServiceImpl implements SetmealService {
 
     /**
      * 套餐分页查询
+     *
      * @param setmealPageQueryDTO
      * @return
      */
     @Override
     public PageResult page(SetmealPageQueryDTO setmealPageQueryDTO) {
-        PageHelper.startPage(setmealPageQueryDTO.getPage(),setmealPageQueryDTO.getPageSize());
+        PageHelper.startPage(setmealPageQueryDTO.getPage(), setmealPageQueryDTO.getPageSize());
         Page<SetmealVO> page = setmealMapper.pageQuery(setmealPageQueryDTO);
-        return new PageResult(page.getTotal(),page.getResult());
+        return new PageResult(page.getTotal(), page.getResult());
     }
 
     /**
      * 新增套餐
+     *
      * @param setmealDTO
      */
     @Transactional
@@ -58,7 +61,7 @@ public class SetmealServiceImpl implements SetmealService {
     public void saveWithDish(SetmealDTO setmealDTO) {
         //DTO给entity拷贝属性
         Setmeal setmeal = new Setmeal();
-        BeanUtils.copyProperties(setmealDTO,setmeal);
+        BeanUtils.copyProperties(setmealDTO, setmeal);
 
         //向套餐表插入数据
         setmealMapper.insert(setmeal);
@@ -79,6 +82,7 @@ public class SetmealServiceImpl implements SetmealService {
 
     /**
      * 批量删除套餐
+     *
      * @param ids
      */
     @Transactional
@@ -87,7 +91,7 @@ public class SetmealServiceImpl implements SetmealService {
         //起售的套餐不能删除
         ids.forEach(id -> {
             Setmeal setmeal = setmealMapper.getByid(id);
-            if(setmeal.getStatus() == StatusConstant.ENABLE){
+            if (setmeal.getStatus() == StatusConstant.ENABLE) {
                 throw new DeletionNotAllowedException(MessageConstant.SETMEAL_ON_SALE);
             }
         });
@@ -106,6 +110,7 @@ public class SetmealServiceImpl implements SetmealService {
 
     /**
      * 根据id查询套餐和关联的菜品数据
+     *
      * @param id
      * @return
      */
@@ -117,13 +122,14 @@ public class SetmealServiceImpl implements SetmealService {
         List<SetmealDish> setmealDishes = setmealDishMapper.getBySetmealId(id);
         SetmealVO setmealVO = new SetmealVO();
         //属性拷贝
-        BeanUtils.copyProperties(setmeal,setmealVO);
+        BeanUtils.copyProperties(setmeal, setmealVO);
         setmealVO.setSetmealDishes(setmealDishes);
         return setmealVO;
     }
 
     /**
      * 修改套餐
+     *
      * @param setmealDTO
      */
     @Transactional
@@ -131,7 +137,7 @@ public class SetmealServiceImpl implements SetmealService {
     public void update(SetmealDTO setmealDTO) {
         //DTO->entity
         Setmeal setmeal = new Setmeal();
-        BeanUtils.copyProperties(setmealDTO,setmeal);
+        BeanUtils.copyProperties(setmealDTO, setmeal);
         //1修改套餐表，执行update
         setmealMapper.update(setmeal);
 
@@ -150,17 +156,18 @@ public class SetmealServiceImpl implements SetmealService {
 
     /**
      * 套餐起售、停售
+     *
      * @param status
      * @param id
      */
     @Override
     public void startOrStop(Integer status, Long id) {
         //起售套餐时，判断套餐内是否有停售菜品，有停售菜品提示“套餐内包含未起售菜品，无法起售”
-        if(status == StatusConstant.ENABLE){
+        if (status == StatusConstant.ENABLE) {
             List<Dish> dishList = dishMapper.getBySetmealId(id);
-            if(dishList.size() > 0&& dishList != null){
+            if (dishList.size() > 0 && dishList != null) {
                 dishList.forEach(dish -> {
-                    if(dish.getStatus()==StatusConstant.DISABLE){
+                    if (dish.getStatus() == StatusConstant.DISABLE) {
                         throw new SetmealEnableFailedException(MessageConstant.SETMEAL_ENABLE_FAILED);
                     }
                 });
@@ -171,5 +178,33 @@ public class SetmealServiceImpl implements SetmealService {
                 .status(status)
                 .build();
         setmealMapper.update(setmeal);
+    }
+
+    /**
+     * 条件查询，根据分类id查询套餐
+     *
+     * @param categoryId
+     * @return
+     */
+    @Override
+    public List<Setmeal> list(Long categoryId) {
+        Setmeal setmeal = new Setmeal();
+        setmeal.setCategoryId(categoryId);
+        //查询起售状态的套餐
+        setmeal.setStatus(StatusConstant.ENABLE);
+        List<Setmeal> list = setmealMapper.list(setmeal);
+        return list;
+
+    }
+
+    /**
+     * 根据id查询套餐和关联的菜品数据
+     *
+     * @param id
+     * @return
+     */
+    @Override
+    public List<DishItemVO> getDishItemById(Long id) {
+        return setmealMapper.getDishItemBySetmealId(id);
     }
 }
