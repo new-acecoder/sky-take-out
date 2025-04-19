@@ -9,6 +9,7 @@ import com.sky.service.SetmealService;
 import com.sky.vo.SetmealVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -41,13 +42,20 @@ public class SetmealController {
      * @return
      */
     @PostMapping
+    //@CacheEvict(cacheNames = "setmealCache",key = "#setmealDTO.categoryId")
     public Result save(@RequestBody SetmealDTO setmealDTO) {
         log.info("新增套餐{}", setmealDTO);
         setmealService.saveWithDish(setmealDTO);
         return Result.success();
     }
 
+    /**
+     * 批量删除套餐
+     * @param ids
+     * @return
+     */
     @DeleteMapping
+    @CacheEvict(cacheNames = "setmealCache",allEntries = true)
     public Result delete(@RequestParam List<Long> ids) {
         //这个参数前要加@RequestParam
         setmealService.deleteBatch(ids);
@@ -71,6 +79,7 @@ public class SetmealController {
      * @return
      */
     @PutMapping
+    @CacheEvict(cacheNames = "setmealCache",allEntries = true)
     public Result update(@RequestBody SetmealDTO setmealDTO) {
         log.info("修改套餐：{}", setmealDTO);
         setmealService.update(setmealDTO);
@@ -83,9 +92,16 @@ public class SetmealController {
      * @param status
      * @return
      */
+    /**
+     * @CacheEvict 注解是 Spring Framework 提供的缓存管理注解，
+     * 用于在方法执行后清除缓存中的数据。
+     * 它通常用于需要更新或删除缓存的场景
+     */
     @PostMapping("/status/{status}")
+    @CacheEvict(cacheNames = "setmealCache",allEntries = true)
     public Result startOrStop(@PathVariable Integer status,Long id ) {
         setmealService.startOrStop(status,id);
         return Result.success();
     }
+
 }

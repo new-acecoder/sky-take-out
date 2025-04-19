@@ -10,6 +10,7 @@ import com.sky.vo.DishItemVO;
 import com.sky.vo.DishVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,12 +33,19 @@ public class SetmealController {
      * @param categoryId
      * @return
      */
+
+    /**
+     * @Cacheable 注解是 Spring Framework 提供的缓存注解，
+     * 用于方法级别的缓存管理。
+     * 它的作用是：当方法被调用时，先检查缓存中是否有对应的结果，
+     * 如果有则直接返回缓存中的结果；
+     * 如果没有，则执行方法并将结果存入缓存。
+     * @param categoryId
+     * @return
+     */
     @GetMapping("/list")
+    @Cacheable(cacheNames = "setmealCache",key = "#categoryId")
     public Result<List<Setmeal>> list(Long categoryId) {
-       /* Setmeal setmeal = new Setmeal();
-        setmeal.setCategoryId(categoryId);
-        //查询起售状态的套餐
-        setmeal.setStatus(StatusConstant.ENABLE);*/
         List<Setmeal> list = setmealService.list(categoryId);
         return Result.success(list);
     }
