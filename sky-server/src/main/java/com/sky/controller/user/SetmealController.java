@@ -40,8 +40,6 @@ public class SetmealController {
      * 它的作用是：当方法被调用时，先检查缓存中是否有对应的结果，
      * 如果有则直接返回缓存中的结果；
      * 如果没有，则执行方法并将结果存入缓存。
-     * @param categoryId
-     * @return
      */
     @GetMapping("/list")
     @Cacheable(cacheNames = "setmealCache",key = "#categoryId")
