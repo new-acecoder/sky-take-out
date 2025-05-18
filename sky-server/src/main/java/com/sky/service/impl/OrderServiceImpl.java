@@ -506,4 +506,29 @@ public class OrderServiceImpl implements OrderService {
         // 将该订单对应的所有菜品信息拼接在一起
         return String.join("", orderDishList);
     }
+
+    /**
+     * 用户催单
+     * @param id
+     */
+    @Override
+    public void reminder(Long id) {
+        //根据id查询订单
+        Orders ordersDB = orderMapper.getById(id);
+        //检验订单是否存在
+        if(ordersDB==null){
+            //抛出业务异常
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+        Map<String,Object> map = new HashMap<>();
+        //type 1 表示来单提醒，2表示催单
+        map.put("type",2);
+        map.put("orderId",id);
+        map.put("content","订单号："+ordersDB.getNumber());
+        String json = JSON.toJSONString(map);
+
+        //推送消息到所有连接的客户端
+        webSocketServer.sendToAllClient(json);
+
+    }
 }
