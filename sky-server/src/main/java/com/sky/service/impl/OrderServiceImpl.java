@@ -429,7 +429,6 @@ public class OrderServiceImpl implements OrderService {
         orders.setStatus(Orders.DELIVERY_IN_PROGRESS);
         orderMapper.update(orders);
     }
-
     /**
      * 完成订单
      * @param id
